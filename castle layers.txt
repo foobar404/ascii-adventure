@@ -1,0 +1,10 @@
+intro: outside the castle
+1: welcoming hall
+
+100: the kings room
+
+?: dungen
+?: kitchen
+?: garden
+?: queens room
+?:

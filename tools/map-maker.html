@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Maker</title>
+
+    <style>
+        .cell {
+            display: inline-block;
+            border: 2px solid silver;
+            user-select: none;
+            text-align: center;
+        }
+
+        #grid {
+            user-select: none;
+            display: grid;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <label>
+            <p>Active Character</p>
+            <input id="activeCharacter" type="text">
+        </label>
+        <label>
+            <p>Grid Height</p>
+            <input id="gridHeight" type="number">
+        </label>
+        <label>
+            <p>Grid Width</p>
+            <input id="gridWidth" type="number">
+        </label>
+
+        <button id="export">Export</button>
+    </header>
+
+    <section id="grid"></section>
+
+    <script>
+        const cellSize = 20;
+        let grid = document.querySelector("#grid");
+        let gridHeightInput = document.querySelector("#gridHeight");
+        let gridWidthInput = document.querySelector("#gridWidth");
+        let activeCharacterInput = document.querySelector("#activeCharacter");
+        let exportButton = document.querySelector("#export")
+        let gridHeight;
+        let gridWidth;
+        let activeCharacter;
+
+        let mouseDown = false;
+        document.body.onmousedown = function () {
+            mouseDown = true;
+        }
+        document.body.onmouseup = function () {
+            mouseDown = false;
+        }
+
+        gridHeightInput.onchange = e =>{
+            gridHeight = Number(e.target.value);
+            drawGrid();
+        }
+        gridWidthInput.onchange = e => {
+            gridWidth = Number(e.target.value);
+            drawGrid();
+        }
+        activeCharacterInput.onchange = e => activeCharacter = e.target.value;
+
+        exportButton.addEventListener("click", e => {
+            let output = [];
+            let row = [];
+            let i = 1;
+            Array.from(grid.childNodes).map(child => {
+                if (i > gridWidth) {
+                    output.push(row);
+                    row = [];
+                    i = 1;
+                }
+                let char = child.innerText ?? ".";
+                row.push(char);
+                i++;
+            });
+            output.push(row);
+
+            window.prompt("", JSON.stringify(output));
+            console.log(JSON.stringify(output));
+        })
+
+        function drawGrid() {
+            if(!gridHeight) return; 
+            if(!gridWidth) return;
+
+            removeAllChildNodes(grid);
+            grid.style.height = cellSize * gridHeight + "px";
+            grid.style.width = cellSize * gridWidth + "px";
+            grid.style.gridTemplateColumns = `repeat(${gridWidth}, 1fr)`;
+            grid.style.gridTemplateRows = `repeat(${gridHeight}, 1fr)`;
+
+            for (let i = 0; i < gridHeight; i++) {
+                for (let j = 0; j < gridWidth; j++) {
+                    let cell = document.createElement("span");
+                    cell.style.height = cellSize + "px";
+                    cell.style.width = cellSize + "px";
+                    cell.classList.add("cell");
+                    cell.innerText = ".";
+
+                    cell.addEventListener("click", (e) => {
+                        e.target.innerText = activeCharacter;
+                    });
+                    cell.addEventListener("mouseenter", (e) => {
+                        if (mouseDown) e.target.innerText = activeCharacter;
+                    });
+
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        function removeAllChildNodes(parent) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+        }
+    </script>
+</body>
+
+</html>
